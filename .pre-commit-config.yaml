@@ -1,0 +1,23 @@
+repos:
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.79.0
+    hooks:
+      - id: terraform_fmt
+    exclude: '^\.terraform/|\.tfstate'
+      - id: terraform_validate
+    exclude: '^\.terraform/|\.tfstate'
+      - id: terraform_tflint
+    exclude: '^\.terraform/|\.tfstate'
+      - id: terraform_docs
+    exclude: '^\.terraform/|\.tfstate'
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+    exclude: '^\.terraform/|\.tfstate'
+      - id: end-of-file-fixer
+    exclude: '^\.terraform/|\.tfstate'
+      - id: check-yaml
+    exclude: '^\.terraform/|\.tfstate'
+        - id: check-added-large-files
+      exclude: '^\.terraform/|\.tfstate'
