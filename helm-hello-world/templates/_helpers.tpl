@@ -10,7 +10,7 @@ Common labels
 */}}
 {{- define "hello-world.labels" -}}
 helm.sh/chart: {{ include "hello-world.chart" . }}
-{{ include "hello-world.selectorLabels" . }}
+{{- include "hello-world.selectorLabels" . | nindent 0 }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
