@@ -3,16 +3,16 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}
   labels:
-    {{ toYaml include "hello-world.labels" . | nindent 4 }}
+    {{ include "hello-world.labels" . | toYaml | trim | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{ toYaml include "hello-world.selectorLabels" . | nindent 6 }}
+      {{  include "hello-world.selectorLabels" . | toYaml | trim | nindent 6 }}
   template:
     metadata:
       labels:
-        {{ toYaml include "hello-world.labels" . | nindent 6 }}
+        {{ include "hello-world.labels" . | toYaml | trim | nindent 6 }}
     spec:
       containers:
         - name: hello-world

@@ -22,3 +22,26 @@ repos:
         exclude: '^(\.terraform/|.*\.tfstate|helm-hello-world/templates/.*)'
       - id: check-added-large-files
         exclude: '^\.terraform/|\.tfstate'
+
+  - repo: local
+    hooks:
+      - id: helm-lint
+        name: helm-lint
+        always_run: true
+        language: docker_image
+        entry: --entrypoint=/bin/sh alpine/helm
+        pass_filenames: false
+        verbose: false
+        args:
+          - -c
+          - helm lint ./helm-hello-world
+      - id: helm-template
+        name: helm-template
+        always_run: true
+        language: docker_image
+        entry: --entrypoint=/bin/sh alpine/helm
+        pass_filenames: false
+        verbose: false
+        args:
+          - -c
+          - helm template ./helm-hello-world

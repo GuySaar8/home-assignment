@@ -3,11 +3,11 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}
   labels:
-    {{ toYaml include "hello-world.labels" . | nindent 4 }}
+    {{ include "hello-world.labels" . | toYaml | trim | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
       targetPort: {{ .Values.containerPort }}
   selector:
-    {{ toYaml include "hello-world.selectorLabels" . | nindent 6 }}
+    {{  include "hello-world.selectorLabels" . | toYaml | trim | nindent 6 }}
