@@ -20,14 +20,17 @@ jobs:
       - name: Build and Tag Docker Image
         run: |
           COMMIT_ID=$(echo $GITHUB_SHA | cut -c1-7)
+          echo "COMMIT_ID=$COMMIT_ID" >> $GITHUB_ENV
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
             TAG=latest
             docker build -t guysaar8/comet-home:$COMMIT_ID -t guysaar8/comet-home:$TAG .
+            echo "TAG=$TAG" >> $GITHUB_ENV
             echo "Docker image tagged with commit ID and 'latest'."
           elif [ "${{ github.event_name }}" == "pull_request" ]; then
             PR_NUMBER=${{ github.event.pull_request.number }}
             TAG=pr${PR_NUMBER}-$COMMIT_ID
             docker build -t guysaar8/comet-home:$TAG .
+            echo "TAG=$TAG" >> $GITHUB_ENV
             echo "Docker image tagged with PR number and commit ID."
           fi
       - name: Log in to Docker Hub
