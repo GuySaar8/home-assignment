@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello World</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        img {
+            margin-top: 20px;
+            max-width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Im excited for this job interview</h1>
+    <img src="{{ url_for('static', filename='image/comet.png') }}" alt="Comet Logo">
+</body>
+</html>
