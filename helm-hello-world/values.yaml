@@ -9,10 +9,10 @@ service:
 
 ingress:
   enabled: true
-  annotations: {}
   hosts:
     - host: hello-world.local
       paths:
+
+
         - /
-  tls: []
 containerPort: 5000

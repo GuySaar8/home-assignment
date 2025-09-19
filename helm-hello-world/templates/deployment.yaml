@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "hello-world.fullname" . }}
+  name: {{ .Release.Name }}
   labels:
-    app: {{ include "hello-world.name" . }}
+    {{ toYaml include "hello-world.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ include "hello-world.name" . }}
+      {{ toYaml include "hello-world.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app: {{ include "hello-world.name" . }}
+        {{ toYaml include "hello-world.labels" . | nindent 6 }}
     spec:
       containers:
         - name: hello-world

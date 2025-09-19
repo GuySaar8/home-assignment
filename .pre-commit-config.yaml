@@ -3,21 +3,22 @@ repos:
     rev: v1.79.0
     hooks:
       - id: terraform_fmt
-    exclude: '^\.terraform/|\.tfstate'
+        exclude: '^\.terraform/|\.tfstate'
       - id: terraform_validate
-    exclude: '^\.terraform/|\.tfstate'
+        exclude: '^\.terraform/|\.tfstate'
       - id: terraform_tflint
-    exclude: '^\.terraform/|\.tfstate'
+        exclude: '^\.terraform/|\.tfstate'
       - id: terraform_docs
-    exclude: '^\.terraform/|\.tfstate'
+        exclude: '^\.terraform/|\.tfstate'
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace
-    exclude: '^\.terraform/|\.tfstate'
+        exclude: '^\.terraform/|\.tfstate'
       - id: end-of-file-fixer
-    exclude: '^\.terraform/|\.tfstate'
+        exclude: '^\.terraform/|\.tfstate'
       - id: check-yaml
-    exclude: '^\.terraform/|\.tfstate'
-        - id: check-added-large-files
-      exclude: '^\.terraform/|\.tfstate'
+        exclude: '^(\.terraform/|.*\.tfstate|helm-hello-world/templates/.*)'
+      - id: check-added-large-files
+        exclude: '^\.terraform/|\.tfstate'

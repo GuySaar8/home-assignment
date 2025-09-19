@@ -23,8 +23,8 @@ resource "aws_iam_user_policy" "eks_describe_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect   = "Allow"
-        Action   = [
+        Effect = "Allow"
+        Action = [
           "eks:DescribeCluster"
         ]
         Resource = "arn:aws:eks:us-east-1:793480251750:cluster/main-eks"

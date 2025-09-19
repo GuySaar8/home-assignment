@@ -1,8 +1,8 @@
 locals {
-  name      = "main-vpc"
-  vpc_cidr  = "10.0.0.0/16"
-  azs       = ["us-east-1a", "us-east-1b"]
-  tags      = {
+  name     = "main-vpc"
+  vpc_cidr = "10.0.0.0/16"
+  azs      = ["us-east-1a", "us-east-1b"]
+  tags = {
     Environment = "dev"
   }
 }
@@ -17,7 +17,7 @@ module "eks" {
   vpc_id          = module.vpc.vpc_id
 
   cluster_endpoint_private_access = true
-  cluster_endpoint_public_access  = true  # Enable public access
+  cluster_endpoint_public_access  = true # Enable public access
 
   eks_managed_node_group_defaults = {
     instance_types = ["t2.micro"]
