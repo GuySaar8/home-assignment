@@ -12,7 +12,5 @@ ingress:
   hosts:
     - host: hello-world.local
       paths:
-
-
         - /
 containerPort: 5000
