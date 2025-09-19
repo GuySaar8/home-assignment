@@ -83,5 +83,5 @@ jobs:
             --namespace $ENV \
             --create-namespace \
             --set image.repository=guysaar8/comet-home \
-            --set image.tag=${{ needs.build-and-push.outputs.image-tag }}
+            --set image.tag=${{ needs.build-and-push.outputs.image-tag }} \
             --set env=$ENV
