@@ -1,0 +1,47 @@
+repos:
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.79.0
+    hooks:
+      - id: terraform_fmt
+        exclude: '^\.terraform/|\.tfstate'
+      - id: terraform_validate
+        exclude: '^\.terraform/|\.tfstate'
+      - id: terraform_tflint
+        exclude: '^\.terraform/|\.tfstate'
+      - id: terraform_docs
+        exclude: '^\.terraform/|\.tfstate'
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '^\.terraform/|\.tfstate'
+      - id: end-of-file-fixer
+        exclude: '^\.terraform/|\.tfstate'
+      - id: check-yaml
+        exclude: '^(\.terraform/|.*\.tfstate|helm-hello-world/templates/.*)'
+      - id: check-added-large-files
+        exclude: '^\.terraform/|\.tfstate'
+
+  - repo: local
+    hooks:
+      - id: helm-lint
+        name: helm-lint
+        always_run: true
+        language: docker_image
+        entry: --entrypoint=/bin/sh alpine/helm
+        pass_filenames: false
+        verbose: false
+        args:
+          - -c
+          - helm lint ./helm-hello-world
+      - id: helm-template
+        name: helm-template
+        always_run: true
+        language: docker_image
+        entry: --entrypoint=/bin/sh alpine/helm
+        pass_filenames: false
+        verbose: false
+        args:
+          - -c
+          - helm template ./helm-hello-world

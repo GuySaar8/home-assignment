@@ -1,0 +1,86 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.docker-tag.outputs.TAG }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and Tag Docker Image
+        id: docker-tag
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          COMMIT_ID=${GITHUB_SHA:0:7}
+          if [ "${GITHUB_REF}" == "refs/heads/main" ]; then
+            TAG=latest
+            docker build -t guysaar8/comet-home:$COMMIT_ID -t guysaar8/comet-home:$TAG .
+          elif [ "${PR_NUMBER}" != "" ]; then
+            TAG=pr${PR_NUMBER}-$COMMIT_ID
+            docker build -t guysaar8/comet-home:$TAG .
+          fi
+          echo "TAG=$TAG"
+          echo "TAG=$TAG" >> $GITHUB_ENV
+          echo "TAG=$TAG" >> $GITHUB_OUTPUT
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Push Docker Image
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            docker push guysaar8/comet-home:latest
+          fi
+          docker push guysaar8/comet-home:$TAG
+
+  deploy:
+    name: Deploy to EKS with Helm
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'latest'
+      - name: Update kubeconfig for EKS
+        run: aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ env.EKS_CLUSTER_NAME }}
+        env:
+          EKS_CLUSTER_NAME: main-eks
+      - name: Deploy with Helm
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            NAMESPACE=dev
+          else
+            NAMESPACE=prd
+          fi
+          helm upgrade --install hello-world ./helm-hello-world \
+            --namespace $NAMESPACE \
+            --create-namespace \
+            --set image.repository=guysaar8/comet-home \
+            --set image.tag=${{ needs.build-and-push.outputs.image-tag }}

@@ -1,0 +1,4 @@
+# Ignore all Terraform local state and provider binaries
+.terraform/
+*.tfstate*
+.terraform.lock.hcl

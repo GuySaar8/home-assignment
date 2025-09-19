@@ -1,0 +1,16 @@
+replicaCount: 1
+image:
+  repository: <your-docker-repo>/hello-world
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  type: LoadBalancer
+  port: 80
+
+ingress:
+  enabled: true
+  hosts:
+    - host: a13e9914bd8e64a168dab94a81339ea4-26454007.us-east-1.elb.amazonaws.com
+      paths:
+        - /
+containerPort: 5000
