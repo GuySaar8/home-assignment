@@ -75,12 +75,13 @@ jobs:
       - name: Deploy with Helm
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
-            NAMESPACE=dev
+            ENV=dev
           else
-            NAMESPACE=prd
+            ENV=prd
           fi
           helm upgrade --install hello-world ./helm-hello-world \
-            --namespace $NAMESPACE \
+            --namespace $ENV \
             --create-namespace \
             --set image.repository=guysaar8/comet-home \
-            --set image.tag=${{ needs.build-and-push.outputs.image-tag }}
+            --set image.tag=${{ needs.build-and-push.outputs.image-tag }} \
+            --set env=$ENV
