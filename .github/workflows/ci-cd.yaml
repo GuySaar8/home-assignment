@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       image-tag: ${{ steps.docker-tag.outputs.TAG }}
-      
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
