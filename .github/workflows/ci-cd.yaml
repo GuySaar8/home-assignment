@@ -74,10 +74,8 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             NAMESPACE=dev
-            TAG=rc-${{ github.event.pull_request.number }}
           else
             NAMESPACE=prd
-            TAG=${{ needs.semantic-release.outputs.release_version }}
           fi
           helm upgrade --install hello-world ./helm-hello-world \
             --namespace $NAMESPACE \
