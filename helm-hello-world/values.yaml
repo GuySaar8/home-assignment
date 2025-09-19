@@ -10,7 +10,7 @@ service:
 ingress:
   enabled: true
   hosts:
-    - host: hello-world.local
+    - host: a13e9914bd8e64a168dab94a81339ea4-26454007.us-east-1.elb.amazonaws.com
       paths:
         - /
 containerPort: 5000
