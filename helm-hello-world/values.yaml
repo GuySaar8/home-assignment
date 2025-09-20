@@ -1,6 +1,6 @@
 replicaCount: 1
 image:
-  repository: <your-docker-repo>/hello-world
+  repository: guysaar8/comet-home
   tag: latest
   pullPolicy: IfNotPresent
 service:

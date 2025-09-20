@@ -83,3 +83,18 @@ Secrets required:
 
 ---
 For any issues, please open an issue in the repository or contact the maintainer.
+
+
+AWS ACM
+External DNS
+diff between ML and AI
+Look for ML tools in AWS
+Load balancers
+Redis
+SQL vs non-SQL
+DNS (cname)
+Subnet
+
+linux
+ulimit command
+cgroups
