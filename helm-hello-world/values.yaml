@@ -11,7 +11,7 @@ ingress:
   enabled: true
   hosts:
     - host:
-        dev: adbe655147c384c6597bd03437fc2691-1211285690.us-east-1.elb.amazonaws.com
+        dev: af47953cd116d4ad38cdc5e903309bb6-1121224400.us-east-1.elb.amazonaws.com
         prd: adbe655147c384c6597bd03437fc2691-1211285690.us-east-1.elb.amazonaws.com
       paths:
         - /
