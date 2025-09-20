@@ -14,9 +14,9 @@ resource "aws_iam_user_policy_attachment" "ecr_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
 }
 
-# Custom inline policy for DescribeCluster
-resource "aws_iam_user_policy" "eks_describe_policy" {
-  name = "deployment-user-eks-describecluster"
+# Custom inline policy for EKS cluster access
+resource "aws_iam_user_policy" "eks_access_policy" {
+  name = "deployment-user-eks-access"
   user = aws_iam_user.deployment_user.name
 
   policy = jsonencode({
@@ -25,9 +25,21 @@ resource "aws_iam_user_policy" "eks_describe_policy" {
       {
         Effect = "Allow"
         Action = [
-          "eks:DescribeCluster"
+          "eks:DescribeCluster",
+          "eks:ListClusters",
+          "eks:AccessKubernetesApi",
+          "eks:GetToken"
         ]
         Resource = "arn:aws:eks:us-east-1:793480251750:cluster/main-eks"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "sts:GetCallerIdentity",
+          "sts:AssumeRole",
+          "eks:ListClusters"
+        ]
+        Resource = "*"
       }
     ]
   })

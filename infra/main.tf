@@ -58,5 +58,15 @@ module "eks" {
     }
   }
 
+  # Add deployment user to aws-auth configmap
+  manage_aws_auth_configmap = true
+  aws_auth_users = [
+    {
+      userarn  = aws_iam_user.deployment_user.arn
+      username = aws_iam_user.deployment_user.name
+      groups   = ["system:masters"]
+    }
+  ]
+
   tags = local.tags
 }
