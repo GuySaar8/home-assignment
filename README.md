@@ -127,12 +127,110 @@ After your first deployment to each environment, you need to configure the ingre
            - /
    ```
 
-> **Production Best Practices Note**: 
+> **Production Best Practices Note**:
 > The manual ALB endpoint configuration is used here for simplicity. In a production environment, you would typically:
 > 1. Install AWS Load Balancer Controller for better ALB integration
 > 2. Use External-DNS controller to automatically manage DNS records
 > 3. Configure a proper domain in Route53 instead of using raw ALB endpoints
 
+## Testing
+
+The project includes comprehensive testing at multiple levels:
+
+### Python Application Tests
+Tests are run in a containerized environment using Python 3.11:
+```bash
+# Run via pre-commit
+pre-commit run python-tests
+
+# Run manually in container
+docker run -v ./src:/src python:3.11-slim /bin/sh -c "cd /src && pip install -r requirements.txt -r requirements-dev.txt && python -m pytest tests/"
+```
+
+### Helm Chart Tests
+Three levels of Helm testing are implemented:
+
+1. **Helm Lint** - Validates chart structure and syntax:
+   ```bash
+   pre-commit run helm-lint
+   # or
+   helm lint ./helm-hello-world
+   ```
+
+2. **Template Validation** - Verifies template rendering:
+   ```bash
+   pre-commit run helm-template
+   # or
+   helm template ./helm-hello-world --debug
+   ```
+
+3. **Unit Tests** - Tests chart functionality:
+   ```bash
+   pre-commit run helm-unittest
+   # or
+   helm unittest ./helm-hello-world
+   ```
+
+Test coverage includes:
+- Deployment configuration
+- Service settings
+- Environment variables
+- Dynamic value substitution
+- Resource specifications
+
+### Terraform Tests
+Automated infrastructure testing using multiple tools:
+
+1. **Format Check** (`terraform fmt`)
+2. **Validation** (`terraform validate`)
+3. **Static Analysis** (`terraform tflint`)
+4. **Documentation** (`terraform-docs`)
+
+## Local Development
+
+### Pre-commit Hooks
+This project uses pre-commit hooks to ensure code quality and run tests before each commit. The hooks include:
+
+1. **Python Tests** (Containerized)
+   - Runs in Python 3.11 Docker container
+   - Executes pytest suite
+   - Validates application functionality
+   - Ensures consistent test environment
+
+2. **Terraform Validation**
+   - Formats Terraform code
+   - Validates Terraform configuration
+   - Runs TFLint for additional checks
+   - Updates Terraform documentation
+
+3. **Helm Chart Testing** (Containerized)
+   - Lints charts using `alpine/helm:3.12.3`
+   - Validates template rendering with debug output
+   - Runs unit tests via `quintush/helm-unittest:3.11.2`
+   - Tests deployment, service, and configuration
+
+4. **General Code Quality**
+   - Checks YAML/JSON syntax
+   - Fixes file endings
+   - Removes trailing whitespace
+   - Prevents large file commits
+
+To set up pre-commit:
+```bash
+# Install pre-commit
+pip install pre-commit
+
+# Install the git hooks
+pre-commit install
+
+# Run against all files (optional)
+pre-commit run --all-files
+```
+
+The hooks will run automatically on `git commit`. You can also run them manually with:
+```bash
+pre-commit run
+```
 
 ## Application Features
 - Environment-aware deployment

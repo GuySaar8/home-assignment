@@ -3,45 +3,68 @@ repos:
     rev: v1.79.0
     hooks:
       - id: terraform_fmt
-        exclude: '^\.terraform/|\.tfstate'
       - id: terraform_validate
-        exclude: '^\.terraform/|\.tfstate'
       - id: terraform_tflint
-        exclude: '^\.terraform/|\.tfstate'
       - id: terraform_docs
-        exclude: '^\.terraform/|\.tfstate'
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace
-        exclude: '^\.terraform/|\.tfstate'
       - id: end-of-file-fixer
-        exclude: '^\.terraform/|\.tfstate'
       - id: check-yaml
-        exclude: '^(\.terraform/|.*\.tfstate|helm-hello-world/templates/.*)'
+        exclude: '^(helm-hello-world/templates/.*)'
       - id: check-added-large-files
         exclude: '^\.terraform/|\.tfstate'
 
   - repo: local
     hooks:
+      - id: python-tests
+        name: Python Tests
+        language: docker_image
+        entry: --entrypoint=/bin/sh python:3.11-slim
+        pass_filenames: false
+        always_run: true
+        args:
+          - -c
+          - |
+            cd src && \
+            export PYTHONPATH=/tmp/site-packages && \
+            mkdir -p /tmp/site-packages && \
+            pip install --target=/tmp/site-packages -r requirements.txt -r requirements-dev.txt && \
+            python -m pytest tests/
+
       - id: helm-lint
-        name: helm-lint
+        name: Helm Lint
         always_run: true
         language: docker_image
-        entry: --entrypoint=/bin/sh alpine/helm
+        entry: --entrypoint=/bin/sh alpine/helm:3.12.3
         pass_filenames: false
-        verbose: false
         args:
           - -c
           - helm lint ./helm-hello-world
+
       - id: helm-template
-        name: helm-template
+        name: Helm Template Validation
         always_run: true
         language: docker_image
-        entry: --entrypoint=/bin/sh alpine/helm
+        entry: --entrypoint=/bin/sh alpine/helm:3.12.3
         pass_filenames: false
-        verbose: false
         args:
           - -c
-          - helm template ./helm-hello-world
+          - helm template ./helm-hello-world --debug
+
+      - id: helm-unittest
+        name: Helm Unit Tests
+        always_run: true
+        language: docker_image
+        entry: --entrypoint=/bin/sh alpine/helm:3.12.3
+        pass_filenames: false
+        args:
+          - -c
+          - |
+            export XDG_DATA_HOME=/tmp/helm && \
+            export XDG_CACHE_HOME=/tmp/helm-cache && \
+            mkdir -p /tmp/helm/plugins /tmp/helm-cache/helm/plugins && \
+            helm plugin install https://github.com/quintush/helm-unittest && \
+            helm unittest ./helm-hello-world

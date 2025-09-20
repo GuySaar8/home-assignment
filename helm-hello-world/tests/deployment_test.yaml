@@ -1,0 +1,30 @@
+suite: test deployment
+templates:
+  - deployment.yaml
+tests:
+  - it: should set correct image repository and tag
+    set:
+      image.repository: test-repo
+      image.tag: v1.0.0
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: test-repo:v1.0.0
+
+  - it: should set correct environment variable
+    set:
+      env: dev
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: ENVIRONMENT
+            value: dev
+
+  - it: should set correct replica count
+    set:
+      replicaCount: 3
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 3
