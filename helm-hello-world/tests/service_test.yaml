@@ -1,0 +1,19 @@
+suite: test service
+templates:
+  - service.yaml
+tests:
+  - it: should set correct service port
+    set:
+      service.port: 8080
+    asserts:
+      - equal:
+          path: spec.ports[0].port
+          value: 8080
+
+  - it: should set correct service type
+    set:
+      service.type: LoadBalancer
+    asserts:
+      - equal:
+          path: spec.type
+          value: LoadBalancer
