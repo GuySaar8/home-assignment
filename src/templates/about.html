@@ -6,15 +6,33 @@
     <style>
         body {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
             text-align: center;
             font-family: Arial, sans-serif;
         }
+        .env-badge {
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: white;
+        }
     </style>
+    <script>
+        window.onload = function() {
+            const envBadge = document.querySelector('.env-badge');
+            const env = '{{ environment }}';
+            envBadge.style.backgroundColor = env === 'prd' ? 'red' : 'green';
+        }
+    </script>
 </head>
 <body>
-    <h1>This is the about page.</h1>
+    <h1>Environment Information</h1>
+    <div class="env-badge">
+        Current Environment: {{ environment }}
+    </div>
 </body>
 </html>
