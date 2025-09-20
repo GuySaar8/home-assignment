@@ -18,5 +18,8 @@ spec:
         - name: hello-world
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: ENVIRONMENT
+              value: {{ .Values.env | quote }}
           ports:
             - containerPort: {{ .Values.containerPort }}
