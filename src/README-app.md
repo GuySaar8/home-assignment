@@ -30,7 +30,7 @@ This is a minimal "Hello World" web application built with Python and Flask for 
 ### Step 2: Build and Run with Docker
 
 1. **Build the Docker Image**
-   In the project directory, run:
+   In the src directory, run:
    ```bash
    docker build -t flask-hello-world .
    ```
