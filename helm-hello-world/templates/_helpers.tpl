@@ -15,6 +15,7 @@ helm.sh/chart: {{ include "hello-world.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+env: {{ .Values.env }}
 {{- end }}
 
 {{/*
