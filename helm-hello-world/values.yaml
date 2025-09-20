@@ -10,7 +10,7 @@ env: dev
 ingress:
   enabled: true
   hosts:
-    - host: 
+    - host:
         dev: a13e9914bd8e64a168dab94a81339ea4-26454007.us-east-1.elb.amazonaws.com
         prd: aa026192c66bd4a688807150222a38bc-268440915.us-east-1.elb.amazonaws.com
       paths:
