@@ -142,8 +142,6 @@ jobs:
 
       - name: Deploy with Helm
         env:
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_HOST: ${{ secrets.DB_HOST }}
           IMAGE_TAG: ${{ needs.build-and-push.outputs.image-tag }}
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
@@ -155,5 +153,5 @@ jobs:
             --namespace $ENV \
             --set image.tag=$IMAGE_TAG \
             --set env=$ENV \
-            --set database.password=$DB_PASSWORD \
-            --set database.host=$DB_HOST
+            --set database.password=${{ secrets.DB_PASSWORD }} \
+            --set database.host=${{ secrets.DB_HOST }}

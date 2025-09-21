@@ -25,12 +25,12 @@ class Config:
             f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
         )
         logger.info("Using PostgreSQL database")
+        logger.info(f"Database URI configured (password masked): postgresql://{DB_USER}:***@{DB_HOST}:{DB_PORT}/{DB_NAME}")
     else:
         # Fallback to SQLite for testing/development
         SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
         logger.info("Using SQLite in-memory database (fallback)")
-
-    logger.info(f"Final database URI: {SQLALCHEMY_DATABASE_URI[:50]}...")
+        logger.info(f"Database URI: {SQLALCHEMY_DATABASE_URI}")
 
     # Disable tracking modifications
     SQLALCHEMY_TRACK_MODIFICATIONS = False
