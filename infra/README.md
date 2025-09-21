@@ -1,100 +1,196 @@
-# Infrastructure Overview
+# Infrastructure
 
-This repository contains Terraform configurations for setting up a robust and scalable infrastructure on AWS. Below is a detailed explanation of the resources created and their purposes.
+This directory contains the Terraform configuration for the Hello World application infrastructure, providing a complete cloud-native environment on AWS.
+
+## Overview
+
+The infrastructure creates environment with:
+- **VPC**: Multi-AZ networking with public, private, and database subnets
+- **EKS Cluster**: Managed Kubernetes cluster for application workloads
+- **RDS PostgreSQL**: Managed database with automated backups and security
+- **Secrets Management**: Secure credential storage and distribution
+- **OIDC Authentication**: GitHub Actions integration with temporary credentials
+- **Security Groups**: Network-level access controls and isolation
+
+## Terraform Modules Used
+
+This infrastructure leverages community-maintained Terraform modules:
+
+### 1. **VPC Module** (`terraform-aws-modules/vpc/aws ~> 5.0`)
+- **Purpose**: Creates complete VPC networking infrastructure
+- **Components**: VPC, subnets, route tables, gateways, security groups
+- **Features**: Multi-AZ deployment, public/private/database subnet tiers
+- **Configuration**:
+  - CIDR: 10.0.0.0/16
+  - Availability Zones: us-east-1a, us-east-1b
+  - Private subnets for EKS worker nodes
+  - Database subnets for RDS isolation
+  - Public subnets for load balancers
+
+### 2. **EKS Module** (`terraform-aws-modules/eks/aws ~> 20.0`)
+- **Purpose**: Provisions managed Kubernetes cluster with best practices
+- **Components**: Control plane, managed node groups, security groups, IAM roles
+- **Features**:
+  - Kubernetes v1.33
+  - SPOT instances for cost optimization (t3.medium)
+  - Auto-scaling (1-10 nodes)
+  - OIDC integration for GitHub Actions
+  - Cluster admin access for Terraform management
+
+### 3. **RDS Module** (`terraform-aws-modules/rds/aws ~> 6.0`)
+- **Purpose**: Manages PostgreSQL database with security and backup
+- **Components**: DB instance, subnet group, parameter group, backups
+- **Features**:
+  - PostgreSQL 14 on db.t3.micro
+  - 5GB storage (auto-scaling to 10GB)
+  - 7-day backup retention
+  - Custom password management
+  - Network isolation in database subnets
 
 ## Resources Created
 
-### 1. **VPC (Virtual Private Cloud)**
-The VPC module is used to create a Virtual Private Cloud that serves as the network foundation for the infrastructure. It includes the following components:
+### Core Infrastructure
 
-- **CIDR Block**: `10.0.0.0/16` (default, configurable via `local.vpc_cidr`)
-- **Subnets**:
-  - **Private Subnets**: Used for resources that should not be directly accessible from the internet.
-  - **Public Subnets**: Used for resources that need internet access, such as load balancers.
-  - **Intra Subnets**: Reserved for internal communication between resources.
-- **NAT Gateway**: Enables private subnets to access the internet securely.
-- **Tags**: Custom tags for resource identification.
-
-### 2. **EKS (Elastic Kubernetes Service)**
-The EKS module provisions a Kubernetes cluster and its associated worker nodes. It includes:
+#### **VPC and Networking**
+```
+VPC (10.0.0.0/16)
+├── Public Subnets (10.0.48.0/24, 10.0.49.0/24)
+│   └── Internet Gateway access
+├── Private Subnets (10.0.0.0/20, 10.0.16.0/20)
+│   └── NAT Gateway for outbound traffic
+├── Database Subnets (10.0.56.0/24, 10.0.57.0/24)
+│   └── Isolated for RDS instances
+└── Route Tables
+    ├── Public routes (0.0.0.0/0 → IGW)
+    ├── Private routes (0.0.0.0/0 → NAT)
+    └── Database routes (local VPC only)
+```
 
 #### **EKS Cluster**
-- **Name**: `primary`
-- **Role**: IAM role (`eksClusterRole`) that allows the cluster to interact with other AWS services.
-- **VPC Configuration**: Uses the private subnets created by the VPC module.
+```
+EKS Cluster (main-eks)
+├── Control Plane (Kubernetes 1.33)
+├── Managed Node Group
+│   ├── Instance Type: t3.medium
+│   ├── Capacity Type: SPOT (cost optimization)
+│   └── Scaling: 1-10 nodes
+├── Security Groups
+│   ├── Cluster Security Group
+│   └── Node Security Group
+└── Access Control
+    ├── Cluster Creator Admin
+    └── GitHub Actions RBAC
+```
 
-#### **EKS Node Group**
-- **Cluster Name**: Associated with the EKS cluster.
-- **Node Group Name**: `main-eks-nodes`
-- **Instance Type**: `t2.micro` (default, configurable).
-- **Scaling Configuration**:
-  - Desired Size: 1
-  - Minimum Size: 1
-  - Maximum Size: 2
-- **Capacity Type**: SPOT instances for cost efficiency.
-- **Role**: IAM role (`eksNodeRole`) that allows nodes to interact with the cluster.
+#### **RDS Database**
+```
+PostgreSQL Instance
+├── Engine: PostgreSQL 14
+├── Instance: db.t3.micro
+├── Storage: 5GB → 10GB (auto-scaling)
+├── Database: hello_world
+├── User: hello_world_user
+├── Port: 5432
+├── Backups: 7-day retention
+└── Security: VPC isolated, EKS-only access
+```
 
-### 3. **IAM Roles**
-IAM roles are created to provide the necessary permissions for the EKS cluster and its worker nodes:
+### Security Components
 
-- **EKS Cluster Role**:
-  - Allows the cluster to assume roles and interact with AWS services.
-  - Policy: `sts:AssumeRole` for `eks.amazonaws.com`.
+#### **Secrets Management**
+- **AWS Secrets Manager**: Stores database credentials
+- **Random Password**: Generated with safe special characters
+- **Kubernetes Secrets**: Auto-created in dev/prd namespaces
+- **Secret Rotation**: Ready for automated rotation
 
-- **EKS Node Role**:
-  - Allows worker nodes to assume roles and interact with the cluster.
-  - Policy: `sts:AssumeRole` for `ec2.amazonaws.com`.
+#### **Identity and Access**
+- **OIDC Provider**: GitHub Actions federation
+- **IAM Roles**:
+  - EKS Service Role
+  - EKS Node Group Role
+  - GitHub Actions Role (AssumeRoleWithWebIdentity)
+- **Security Groups**: Network access control
+- **RBAC**: Kubernetes role-based permissions
 
-### 4. **Networking**
-The networking module handles the creation of subnets and routing configurations:
+#### **Network Security**
+```
+Security Group Rules:
+├── RDS Security Group
+│   ├── Ingress: Port 5432 from EKS Cluster SG
+│   ├── Ingress: Port 5432 from EKS Node SG
+│   └── Egress: All outbound
+├── EKS Cluster Security Group (managed)
+└── EKS Node Security Group (managed)
+```
 
-- **Private Subnets**: Used for internal resources.
-- **Public Subnets**: Used for internet-facing resources.
-- **Routing**: Configured to enable communication between subnets and external networks.
+## File Structure
 
-## Variables
+```
+infra/
+├── main.tf              # VPC and EKS module configurations
+├── database.tf          # RDS module and database security group
+├── secrets.tf           # Password generation and Secrets Manager
+├── k8s-secrets.tf       # Kubernetes secrets for database connection
+├── namespaces.tf        # Kubernetes namespaces (dev/prd)
+├── iam-roles.tf         # IAM roles and policies for services
+├── oidc.tf              # OIDC provider for GitHub Actions
+├── providers.tf         # Terraform and AWS provider configuration
+└── README.md            # This documentation
+```
 
-### VPC Variables
-- `local.name`: Name of the VPC.
-- `local.vpc_cidr`: CIDR block for the VPC.
-- `local.azs`: Availability zones for subnet distribution.
-- `local.tags`: Tags for resource identification.
+## Deployment Guide
 
-### EKS Variables
-- `var.subnet_ids`: List of subnet IDs used by the EKS cluster.
+### Prerequisites
+- AWS CLI configured with appropriate permissions
+- Terraform >= 1.0 installed
+- kubectl installed for cluster management
 
-## Outputs
+### Step-by-Step Deployment
 
-### VPC Outputs
-- **Private Subnet IDs**: Used by the EKS cluster.
-- **Public Subnet IDs**: Used for load balancers.
-
-### EKS Outputs
-- **Cluster Name**: Name of the EKS cluster.
-- **Node Group Name**: Name of the worker node group.
-
-## Usage
-
-1. Clone the repository.
-2. Initialize Terraform:
+1. **Initialize Terraform**:
    ```bash
+   cd infra/
    terraform init
    ```
-3. Plan the infrastructure:
+
+2. **Review the Plan**:
    ```bash
    terraform plan
    ```
-4. Apply the configuration:
+
+3. **Deploy Infrastructure**:
    ```bash
    terraform apply
    ```
 
-## Notes
+4. **Configure kubectl** (post-deployment):
+   ```bash
+   aws eks update-kubeconfig --region us-east-1 --name main-eks
+   ```
 
-- Ensure that AWS credentials are configured before running Terraform commands.
-- Adjust the `local` variables in `main.tf` to match your environment.
-- Review the `terraform.tfstate` file for state management.
+5. **Verify Deployment**:
+   ```bash
+   kubectl get nodes
+   kubectl get namespaces
+   ```
 
-## License
+### Infrastructure Outputs
+- **EKS Cluster Endpoint**: For kubectl configuration
+- **RDS Endpoint**: Database connection endpoint
+- **VPC ID**: For additional resource deployment
+- **Subnet IDs**: For application load balancers
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+## Terraform State Management
+
+For production environments, consider:
+- **S3 Backend**: Store state in S3 bucket with DynamoDB locking
+- **Managed Solutions**: Use platforms like **env0** or **Terraform Cloud** for better state management and automation
+- **Security**: Never commit `terraform.tfstate` to version control (contains sensitive data like passwords/keys, causes merge conflicts, can corrupt infrastructure state, and exposes internal resource IDs)
+
+## Cleanup and Destruction
+
+### Safe Cleanup Process
+**Destroy Infrastructure**:
+   ```bash
+   terraform destroy
+   ```

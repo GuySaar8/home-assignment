@@ -1,7 +1,7 @@
 # DevOps Home Assignment
 
 ## Overview
-This project demonstrates a complete DevOps workflow for deploying a minimal Python Flask "Hello World" web application.
+This project demonstrates a complete DevOps workflow for deploying a Python Flask web application with PostgreSQL database integration.
 
 It includes:
 - Containerized Python Flask application
@@ -9,7 +9,7 @@ It includes:
 - CI/CD pipeline with GitHub Actions
 - Kubernetes deployment using Helm
 - Environment-specific deployments (dev/prd)
-- Automated PR environments with cleanup
+- Automated PR environment
 
 ## Project Structure
 ```
@@ -35,23 +35,26 @@ It includes:
 aws configure
 ```
 
-Required permissions:
-- EKS cluster management
-- VPC management
-- IAM role/policy management
-- Load Balancer management
+When prompted, provide:
+- **AWS Access Key ID**: Your AWS access key
+- **AWS Secret Access Key**: Your AWS secret key
+- **Default region name**: `us-east-1` (this project is configured for US East 1)
+- **Default output format**: `json` (recommended)
+
+Required AWS IAM permissions for your user/role:
+- **EKS**: Create and manage EKS clusters, node groups, and access entries
+- **VPC/Networking**: Create VPCs, subnets, internet gateways, NAT gateways, route tables
+- **IAM**: Create and manage roles, policies, and OIDC providers for EKS and GitHub Actions
+- **EC2**: Create security groups, launch templates, and manage EC2 instances for EKS nodes
+- **RDS**: Create and manage PostgreSQL database instances, parameter groups, and subnet groups
+- **Secrets Manager**: Create and manage database credentials and other sensitive data
+- **KMS**: Create and manage encryption keys for EKS and RDS
+
+> For simplicity during setup, you can use a user with `AdministratorAccess` policy. For production environments, create a more restrictive custom policy with only the specific permissions needed.
 
 ### Step 2: Fork and Configure Repository
 1. Fork this repository
-2. Update Docker repository configuration in two places:
-
-   a. In `helm-hello-world/values.yaml`:
-   ```yaml
-   image:
-     repository: YOUR-DOCKERHUB-USERNAME/hello-world
-   ```
-
-   b. In `.github/workflows/ci-cd.yaml`:
+2. Update Docker repository configuration in `.github/workflows/ci-cd.yaml`:
    ```yaml
    env:
      docker-registry: YOUR-DOCKERHUB-USERNAME/hello-world  # Must match values.yaml repository
@@ -75,11 +78,16 @@ terraform apply
 ```
 
 Key Terraform resources created:
-- EKS cluster
-- VPC with public/private subnets
-- Node groups
-- IAM roles and policies
-- Security groups
+- **EKS cluster** with OIDC provider and access entries
+- **VPC** with public/private/database subnets across 2 AZs
+- **EKS managed node groups** with t3.medium spot instances
+- **PostgreSQL RDS instance** (db.t3.micro) with automated backups
+- **AWS Secrets Manager** secrets for database credentials
+- **Kubernetes secrets** for database connection (managed by Terraform)
+- **Security groups** for EKS cluster, worker nodes, and RDS access
+- **IAM roles and policies** for EKS, node groups, and GitHub Actions OIDC
+- **KMS keys** for EKS and RDS encryption
+- **Kubernetes namespaces** (dev/prd) with proper RBAC
 
 ### Step 4: Configure kubectl
 ```bash
@@ -230,9 +238,3 @@ The hooks will run automatically on `git commit`. You can also run them manually
 ```bash
 pre-commit run
 ```
-
-## Application Features
-- Environment-aware deployment
-- Visual environment indicator (green=dev, red=prd)
-- Unique PR deployments
-- Load balanced access
