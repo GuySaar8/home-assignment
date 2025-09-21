@@ -72,7 +72,7 @@ def init_db():
     try:
         db_uri = app.config.get('SQLALCHEMY_DATABASE_URI')
         logger.info(f"Database URI: {db_uri[:50]}..." if db_uri else "No database URI configured")
-        
+
         if db_uri and 'None' not in db_uri:
             logger.info("Database URI looks valid, attempting to create tables")
             with app.app_context():
@@ -81,30 +81,30 @@ def init_db():
                     logger.info("Testing database connection...")
                     with db.engine.connect() as connection:
                         logger.info("Database connection established successfully")
-                        
+
                         # Test with simple query
                         logger.info("Executing test query...")
                         result = connection.execute(db.text("SELECT 1 as test"))
                         test_result = result.fetchone()
                         logger.info(f"Test query successful: {test_result}")
-                        
+
                     # Now create tables
                     logger.info("Creating database tables...")
                     db.create_all()
                     logger.info("Database tables created successfully")
-                    
+
                     # Verify tables were created
                     logger.info("Verifying table creation...")
                     with db.engine.connect() as connection:
                         # Check if our Message table exists
                         result = connection.execute(db.text("""
-                            SELECT table_name 
-                            FROM information_schema.tables 
+                            SELECT table_name
+                            FROM information_schema.tables
                             WHERE table_schema = 'public'
                         """))
                         tables = [row[0] for row in result.fetchall()]
                         logger.info(f"Tables found in database: {tables}")
-                        
+
                 except Exception as db_error:
                     logger.error(f"Database operation failed: {db_error}")
                     logger.error(f"Error type: {type(db_error).__name__}")

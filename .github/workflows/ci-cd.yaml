@@ -150,6 +150,4 @@ jobs:
           helm upgrade --install hello-world ./helm-hello-world \
             --namespace $ENV \
             --set image.tag=${{ needs.build-and-push.outputs.image-tag }} \
-            --set env=$ENV \
-            --set database.password=${{ secrets.DB_PASSWORD }} \
-            --set database.host=${{ secrets.DB_HOST }}
+            --set env=$ENV

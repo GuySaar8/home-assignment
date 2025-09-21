@@ -1,5 +1,6 @@
 import os
 import logging
+from urllib.parse import quote_plus
 
 # Configure logging for config module
 logging.basicConfig(level=logging.INFO)

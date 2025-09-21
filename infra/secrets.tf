@@ -3,10 +3,14 @@
 ################################################################################
 
 resource "random_password" "db_password" {
-  length  = 16
-  special = true
-  # Exclude special characters that might cause issues with PostgreSQL
-  override_special = "!#$%&*()-_=+[]{}<>:?"
+  length           = 16
+  special          = true
+  override_special = "!#$*()-_=+[]{}~"
+
+  # Force regeneration of password with new character set
+  keepers = {
+    version = "v2" # Change this to force password regeneration
+  }
 }
 
 ################################################################################

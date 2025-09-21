@@ -20,10 +20,11 @@ module "db" {
   max_allocated_storage = 10 # Cap at 10GB, more than enough for visit logs
 
   # Credentials
-  db_name  = "hello_world"
-  username = "hello_world_user"
-  port     = 5432
-  password = random_password.db_password.result # Use the generated password
+  db_name                     = "hello_world"
+  username                    = "hello_world_user"
+  port                        = 5432
+  password                    = random_password.db_password.result # Use the generated password
+  manage_master_user_password = false                              # Disable AWS automatic password management
 
   # Network
   vpc_security_group_ids = [aws_security_group.rds.id]
