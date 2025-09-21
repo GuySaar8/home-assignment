@@ -20,7 +20,7 @@ module "db" {
   username                    = "hello_world_user"
   port                        = 5432
   password                    = random_password.db_password.result
-  manage_master_user_password = false                              # Disable AWS automatic password management
+  manage_master_user_password = false # Disable AWS automatic password management
 
   # Network
   vpc_security_group_ids = [aws_security_group.rds.id]
