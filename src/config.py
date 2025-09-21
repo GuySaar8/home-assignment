@@ -1,6 +1,5 @@
 import os
 import logging
-from urllib.parse import quote_plus
 
 # Configure logging for config module
 logging.basicConfig(level=logging.INFO)
@@ -15,7 +14,7 @@ class Config:
     DB_NAME = os.getenv('DB_NAME')
 
     logger.info(f"Database config - User: {DB_USER}")
-    logger.info(f"Database config - Host: {DB_HOST}")
+    logger.info(f"Database config - Host: {'***' if DB_HOST else 'Not configured'}")
     logger.info(f"Database config - Port: {DB_PORT}")
     logger.info(f"Database config - Name: {DB_NAME}")
     logger.info(f"Database config - Password configured: {bool(DB_PASSWORD)}")

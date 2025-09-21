@@ -21,7 +21,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.11'
 
       - name: Install dependencies
         run: |
@@ -149,5 +149,6 @@ jobs:
           fi
           helm upgrade --install hello-world ./helm-hello-world \
             --namespace $ENV \
+            --set image.repository=${{ env.docker-registry }} \
             --set image.tag=${{ needs.build-and-push.outputs.image-tag }} \
             --set env=$ENV

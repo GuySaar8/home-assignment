@@ -21,3 +21,16 @@ containerPort: 5000
 database:
   enabled: true
   secretName: hello-world-db-secret
+
+# Health check configuration
+healthCheck:
+  livenessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
