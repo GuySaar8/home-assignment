@@ -54,6 +54,16 @@ resource "aws_iam_policy" "github_actions_eks_deploy" {
           "eks:ListNodegroups"
         ]
         Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ]
+        Resource = [
+          "arn:aws:secretsmanager:us-east-1:793480251750:secret:hello-world-*"
+        ]
       }
     ]
   })
