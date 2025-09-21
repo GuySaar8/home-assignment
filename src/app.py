@@ -12,32 +12,50 @@ ENVIRONMENT = os.getenv('ENVIRONMENT', 'dev')
 
 @app.route('/')
 def hello_world():
-    # Record the visit
-    visit = Visit(page='home', environment=ENVIRONMENT)
-    db.session.add(visit)
-    db.session.commit()
+    visit_count = 0
+    try:
+        # Record the visit
+        visit = Visit(page='home', environment=ENVIRONMENT)
+        db.session.add(visit)
+        db.session.commit()
 
-    # Get visit count for this page
-    visit_count = Visit.query.filter_by(page='home').count()
+        # Get visit count for this page
+        visit_count = Visit.query.filter_by(page='home').count()
+    except Exception as e:
+        print(f"Database error: {e}")
+        visit_count = "N/A (DB Error)"
+
     return render_template('index.html', visit_count=visit_count)
 
 @app.route('/about')
 def about():
-    # Record the visit
-    visit = Visit(page='about', environment=ENVIRONMENT)
-    db.session.add(visit)
-    db.session.commit()
+    visit_count = 0
+    try:
+        # Record the visit
+        visit = Visit(page='about', environment=ENVIRONMENT)
+        db.session.add(visit)
+        db.session.commit()
 
-    # Get visit count for this page
-    visit_count = Visit.query.filter_by(page='about').count()
+        # Get visit count for this page
+        visit_count = Visit.query.filter_by(page='about').count()
+    except Exception as e:
+        print(f"Database error: {e}")
+        visit_count = "N/A (DB Error)"
+
     return render_template('about.html', environment=ENVIRONMENT, visit_count=visit_count)
 
 # Create tables on startup if they don't exist (only if database is configured)
 def init_db():
     """Initialize database tables if database is properly configured"""
-    if app.config.get('SQLALCHEMY_DATABASE_URI') and 'None' not in app.config['SQLALCHEMY_DATABASE_URI']:
-        with app.app_context():
-            db.create_all()
+    try:
+        if app.config.get('SQLALCHEMY_DATABASE_URI') and 'None' not in app.config['SQLALCHEMY_DATABASE_URI']:
+            with app.app_context():
+                db.create_all()
+                print("Database tables created successfully")
+    except Exception as e:
+        print(f"Database initialization failed: {e}")
+        # Don't fail the app startup, just log the error
+        pass
 
 if __name__ == '__main__':
     # Only initialize database when running directly
