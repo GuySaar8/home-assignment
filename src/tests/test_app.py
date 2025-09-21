@@ -1,11 +1,20 @@
 import unittest
-from app import app
+from app import app, db
 
 
 class TestFlaskApp(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
         self.app.testing = True
+
+        # Initialize database for testing
+        with app.app_context():
+            db.create_all()
+
+    def tearDown(self):
+        # Clean up database after each test
+        with app.app_context():
+            db.drop_all()
 
     def test_home_status_code(self):
         """Test that home page loads successfully"""
