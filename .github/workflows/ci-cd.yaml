@@ -139,6 +139,10 @@ jobs:
           EKS_CLUSTER_NAME: main-eks
 
       - name: Deploy with Helm
+        env:
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          IMAGE_TAG: ${{ needs.build-and-push.outputs.image-tag }}
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             export ENV=dev
@@ -147,7 +151,7 @@ jobs:
           fi
           helm upgrade --install hello-world ./helm-hello-world \
             --namespace $ENV \
-            --set image.tag=${{ needs.build-and-push.outputs.image-tag }} \
-            --set env=$ENV \
-            --set database.password=${{ secrets.DB_PASSWORD }} \
-            --set database.host=${{ secrets.DB_HOST }}
+            --set-string image.tag="$IMAGE_TAG" \
+            --set-string env="$ENV" \
+            --set-string database.password="$DB_PASSWORD" \
+            --set-string database.host="$DB_HOST"
