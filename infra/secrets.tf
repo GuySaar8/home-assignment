@@ -1,22 +1,12 @@
-################################################################################
 # Database Password Generation
-################################################################################
 
 resource "random_password" "db_password" {
   length           = 16
   special          = true
   override_special = "!#$*()-_=+[]{}~"
-
-  # Force regeneration of password with new character set
-  keepers = {
-    version = "v2" # Change this to force password regeneration
-  }
 }
 
-################################################################################
 # AWS Secrets Manager Secret
-################################################################################
-
 resource "aws_secretsmanager_secret" "rds_credentials" {
   name_prefix = "hello-world-${local.tags.Environment}-rds-"
   description = "RDS credentials for Hello World app"

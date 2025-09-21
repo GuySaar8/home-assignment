@@ -1,7 +1,3 @@
-################################################################################
-# RDS Module
-################################################################################
-
 module "db" {
   source  = "terraform-aws-modules/rds/aws"
   version = "~> 6.0"
@@ -16,14 +12,14 @@ module "db" {
   instance_class       = "db.t3.micro"
 
   # Storage
-  allocated_storage     = 5  # Minimum storage for RDS is 5GB
-  max_allocated_storage = 10 # Cap at 10GB, more than enough for visit logs
+  allocated_storage     = 5
+  max_allocated_storage = 10
 
   # Credentials
   db_name                     = "hello_world"
   username                    = "hello_world_user"
   port                        = 5432
-  password                    = random_password.db_password.result # Use the generated password
+  password                    = random_password.db_password.result
   manage_master_user_password = false                              # Disable AWS automatic password management
 
   # Network
