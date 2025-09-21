@@ -1,7 +1,3 @@
-################################################################################
-# GitHub OIDC Provider
-################################################################################
-
 # Create GitHub OIDC provider for secure authentication with GitHub Actions
 resource "aws_iam_openid_connect_provider" "github" {
   url = "https://token.actions.githubusercontent.com"

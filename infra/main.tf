@@ -66,8 +66,6 @@ module "eks" {
     }
   }
 
-  # Enable cluster creator admin permissions so local Terraform can manage resources
-  # Root account access already exists from cluster creation
   enable_cluster_creator_admin_permissions = true
 
   access_entries = {
