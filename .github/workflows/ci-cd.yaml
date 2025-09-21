@@ -151,7 +151,7 @@ jobs:
           fi
           helm upgrade --install hello-world ./helm-hello-world \
             --namespace $ENV \
-            --set-string image.tag="$IMAGE_TAG" \
-            --set-string env="$ENV" \
-            --set-string database.password="$DB_PASSWORD" \
-            --set-string database.host="$DB_HOST"
+            --set image.tag="$IMAGE_TAG" \
+            --set env="$ENV" \
+            --set database.password="$DB_PASSWORD" \
+            --set database.host="$DB_HOST"
