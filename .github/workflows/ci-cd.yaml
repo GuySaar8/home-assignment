@@ -107,7 +107,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./src
           push: true
           tags: ${{ env.docker-registry }}:${{ steps.docker-tag.outputs.TAG }}
 

@@ -2,5 +2,6 @@
 .terraform/
 *.tfstate*
 .terraform.lock.hcl
+# Ignore Python bytecode files
 __pycache__/
-.pytest_cache/
+*.pyc
