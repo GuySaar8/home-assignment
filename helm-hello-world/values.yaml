@@ -11,8 +11,13 @@ ingress:
   enabled: true
   hosts:
     - host:
-        dev: af47953cd116d4ad38cdc5e903309bb6-1121224400.us-east-1.elb.amazonaws.com
-        prd: adbe655147c384c6597bd03437fc2691-1211285690.us-east-1.elb.amazonaws.com
+        dev: aa280ea17168841cc9c775cecb10b14d-1556324884.us-east-1.elb.amazonaws.com
+        prd: afe4f3e296de4475c82556dd0b22974b-2057351270.us-east-1.elb.amazonaws.com
       paths:
         - /
 containerPort: 5000
+
+# Database configuration
+database:
+  enabled: true
+  secretName: hello-world-db-secret

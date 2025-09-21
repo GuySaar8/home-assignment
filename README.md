@@ -60,12 +60,11 @@ Required permissions:
    Make sure both files use the same repository name to ensure CI/CD pushes images to the correct location.
 3. Configure GitHub Secrets:
    ```
-   AWS_ACCESS_KEY_ID
-   AWS_SECRET_ACCESS_KEY
-   AWS_REGION
    DOCKERHUB_USERNAME
    DOCKERHUB_TOKEN
    ```
+
+   Note: AWS authentication now uses OpenID Connect (OIDC) for enhanced security instead of static access keys.
 
 ### Step 3: Deploy Infrastructure
 ```bash
