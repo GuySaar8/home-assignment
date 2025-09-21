@@ -65,6 +65,7 @@ Required AWS IAM permissions for your user/role:
    ```
    DOCKERHUB_USERNAME
    DOCKERHUB_TOKEN
+   AWS_ACCOUNT_ID
    ```
 
    Note: AWS authentication now uses OpenID Connect (OIDC) for enhanced security instead of static access keys.
