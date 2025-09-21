@@ -14,14 +14,14 @@ module "vpc" {
   name = local.name
   cidr = local.vpc_cidr
 
-  azs             = local.azs
-  private_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 4, k)]
-  public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 48)]
-  intra_subnets   = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 52)]
-  # database_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 56)]
+  azs              = local.azs
+  private_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 4, k)]
+  public_subnets   = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 48)]
+  intra_subnets    = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 52)]
+  database_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 56)]
 
-  # create_database_subnet_group = true
-  # create_database_subnet_route_table = true
+  create_database_subnet_group       = true
+  create_database_subnet_route_table = true
 
   enable_nat_gateway = true
   single_nat_gateway = true
@@ -34,16 +34,16 @@ module "vpc" {
     "kubernetes.io/role/internal-elb" = 1
   }
 
-  # database_subnet_tags = {
-  #   "purpose" = "rds"
-  # }
+  database_subnet_tags = {
+    "purpose" = "rds"
+  }
 
   tags = local.tags
 }
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 19.0"
+  version = "~> 20.0"
 
   cluster_name    = "main-eks"
   cluster_version = "1.33"
@@ -66,15 +66,23 @@ module "eks" {
     }
   }
 
-  # Add deployment user to aws-auth configmap
-  manage_aws_auth_configmap = true
-  aws_auth_users = [
-    {
-      userarn  = aws_iam_user.deployment_user.arn
-      username = aws_iam_user.deployment_user.name
-      groups   = ["system:masters"]
+  # Only create access entry for GitHub Actions role
+  # Root account access already exists from cluster creation
+  enable_cluster_creator_admin_permissions = false
+
+  access_entries = {
+    github-actions = {
+      principal_arn = aws_iam_role.github_actions.arn
+      policy_associations = {
+        cluster_admin = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type = "cluster"
+          }
+        }
+      }
     }
-  ]
+  }
 
   tags = local.tags
 }

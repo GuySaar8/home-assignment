@@ -16,3 +16,12 @@ ingress:
       paths:
         - /
 containerPort: 5000
+
+# Database configuration
+database:
+  enabled: true
+  username: "hello_world_user"
+  password: ""               # Will be set via --set in GitHub Actions (sensitive)
+  host: ""                   # Will be set via --set in GitHub Actions (sensitive)
+  port: "5432"
+  name: "hello_world"

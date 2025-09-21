@@ -30,6 +30,9 @@ repos:
           - |
             cd src && \
             export PYTHONPATH=/tmp/site-packages && \
+            export DB_HOST="" && \
+            export DB_PASSWORD="" && \
+            export TESTING=true && \
             mkdir -p /tmp/site-packages && \
             pip install --target=/tmp/site-packages -r requirements.txt -r requirements-dev.txt && \
             python -m pytest tests/
