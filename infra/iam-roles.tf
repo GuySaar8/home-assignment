@@ -2,6 +2,9 @@
 # GitHub Actions IAM Role for EKS Deployment
 ################################################################################
 
+# Get current AWS account ID
+data "aws_caller_identity" "current" {}
+
 # Create trust policy for GitHub Actions
 data "aws_iam_policy_document" "github_actions_assume_role_policy" {
   statement {
@@ -62,7 +65,7 @@ resource "aws_iam_policy" "github_actions_eks_deploy" {
           "secretsmanager:DescribeSecret"
         ]
         Resource = [
-          "arn:aws:secretsmanager:us-east-1:793480251750:secret:hello-world-*"
+          "arn:aws:secretsmanager:us-east-1:${data.aws_caller_identity.current.account_id}:secret:hello-world-*"
         ]
       }
     ]
